@@ -82,6 +82,23 @@ jobs:
         run: |
           echo "$GOOGLE_SERVICES_JSON_BASE64" | base64 --decode > android/app/google-services.json
 
+      # TAMBAHAN: Memperbaiki resolusi dependency Gradle
+      # Menambahkan Maven Central untuk plugin Gradle
+      # Termasuk plugin yang digunakan Flutter
+      - name: Configure Gradle Repositories
+        run: |
+          mkdir -p "$HOME/.gradle/init.d"
+
+          cat > "$HOME/.gradle/init.d/repositories.gradle" <<'EOF'
+          gradle.beforeSettings { settings ->
+              settings.pluginManagement.repositories {
+                  mavenCentral()
+                  google()
+                  gradlePluginPortal()
+              }
+          }
+          EOF
+
       # Membuat APK release
       - name: Build Release APK
         run: flutter build apk --release
